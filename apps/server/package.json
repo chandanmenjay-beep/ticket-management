@@ -1,0 +1,24 @@
+{
+  "name": "@ticket-management/server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "/home/enjay/.bun/bin/bun --watch src/index.ts"
+  },
+  "dependencies": {
+    "@better-auth/prisma-adapter": "^1.6.20",
+    "@prisma/adapter-better-sqlite3": "^7.8.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "better-auth": "^1.6.20",
+    "better-sqlite3": "^12.11.1",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "pg": "^8.22.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.17",
+    "typescript": "^5.8.2"
+  }
+}
