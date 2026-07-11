@@ -24,6 +24,8 @@ model User {
   banned        Boolean?
   banReason     String?
   banExpires    DateTime?
+  deletedAt     DateTime?
+  tickets       Ticket[]
   sessions      Session[]
   accounts      Account[]
 }
@@ -62,4 +64,39 @@ model Verification {
   expiresAt  DateTime
   createdAt  DateTime?
   updatedAt  DateTime?
+}
+
+model Customer {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  tickets   Ticket[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Ticket {
+  id           String          @id @default(cuid())
+  subject      String
+  status       String          @default("open") // open, pending, resolved, closed
+  category     String          @default("general") // technical, refund, renewal, general
+  customerId   String
+  customer     Customer        @relation(fields: [customerId], references: [id])
+  assignedToId String?
+  assignedTo   User?           @relation(fields: [assignedToId], references: [id])
+  messages     TicketMessage[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+}
+
+model TicketMessage {
+  id         String   @id @default(cuid())
+  ticketId   String
+  ticket     Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  bodyText   String   // Plain text body
+  bodyHtml   String?  // HTML body
+  senderType String   // "CUSTOMER" or "AGENT"
+  senderId   String?  // Links to either Customer.id or User.id based on senderType
+  messageId  String?  @unique // The "Message-ID" header from the email
+  createdAt  DateTime @default(now())
 }

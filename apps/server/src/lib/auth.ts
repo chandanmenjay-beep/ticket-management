@@ -1,14 +1,16 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient } from "@prisma/client";
-import { Pool } from "pg";
-import { PrismaPg } from "@prisma/adapter-pg";
 import { admin } from "better-auth/plugins";
 
-const connectionString = "postgres://postgres:postgres@localhost:51214/template1?sslmode=disable";
-const pool = new Pool({ connectionString });
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+
+const connectionString = process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:51214/template1?sslmode=disable";
+const pool = new Pool({ connectionString, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000 });
+pool.on('error', (err) => console.error('Unexpected error on idle client', err));
 const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+export const prisma = new PrismaClient({ adapter });
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",

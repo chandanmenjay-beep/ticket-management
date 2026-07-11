@@ -1,5 +1,5 @@
 import * as dotenv from "dotenv";
-dotenv.config({ path: "../../server/.env" });
+dotenv.config({ path: "../../.env" });
 
 import { PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
@@ -9,7 +9,10 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin } from "better-auth/plugins";
 
 async function main() {
-  const connectionString = "postgres://postgres:postgres@localhost:51214/template1?sslmode=disable";
+  let connectionString = process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:51214/template1?sslmode=disable";
+  if (process.env.NODE_ENV === "test" || process.env.DATABASE_URL?.includes("template1_test")) {
+    connectionString = "postgres://postgres:postgres@localhost:51214/template1_test";
+  }
   const pool = new Pool({ connectionString });
   const adapter = new PrismaPg(pool);
   const prisma = new PrismaClient({ adapter });
@@ -36,7 +39,7 @@ async function main() {
     process.exit(1);
   }
 
-  // Check if admin already exists
+  // Seed admin user
   const existingUser = await prisma.user.findUnique({
     where: { email },
   });
@@ -48,33 +51,72 @@ async function main() {
       data: { role: "admin" },
     });
     console.log("Admin user role updated successfully!");
-    process.exit(0);
+  } else {
+    console.log(`Creating admin user: ${email}...`);
+    const headers = new Headers();
+    headers.set("Content-Type", "application/json");
+
+    const response = await seedAuth.api.signUpEmail({
+      body: {
+        name: "Admin",
+        email: email,
+        password: password,
+      },
+      asResponse: true,
+    });
+
+    if (!response || !response.ok) {
+      console.error("Failed to seed admin user");
+      console.error(await response?.text());
+      process.exit(1);
+    }
+    
+    // Set role to admin via Prisma
+    await prisma.user.update({
+      where: { email },
+      data: { role: "admin" },
+    });
+    console.log("Admin user seeded successfully!");
   }
 
-  console.log(`Creating admin user: ${email}...`);
-
-  // We must pass headers so Better Auth treats this as a valid request.
-  const headers = new Headers();
-  headers.set("Content-Type", "application/json");
-
-  // Call the signup API programmatically
-  const response = await seedAuth.api.signUpEmail({
-    body: {
-      name: "Admin",
-      email: email,
-      password: password,
-      role: "admin", // override default role
-    },
-    asResponse: true,
+  // Seed agent user
+  const agentEmail = "agent@example.com";
+  const existingAgent = await prisma.user.findUnique({
+    where: { email: agentEmail },
   });
 
-  if (!response || !response.ok) {
-    console.error("Failed to seed admin user");
-    console.error(await response?.text());
-    process.exit(1);
+  if (existingAgent) {
+    console.log(`User ${agentEmail} already exists. Updating role to agent.`);
+    await prisma.user.update({
+      where: { email: agentEmail },
+      data: { role: "agent" },
+    });
+    console.log("Agent user role updated successfully!");
+  } else {
+    console.log(`Creating agent user: ${agentEmail}...`);
+    const agentResponse = await seedAuth.api.signUpEmail({
+      body: {
+        name: "Agent",
+        email: agentEmail,
+        password: password, // Use same password for testing
+      },
+      asResponse: true,
+    });
+
+    if (!agentResponse || !agentResponse.ok) {
+      console.error("Failed to seed agent user");
+      console.error(await agentResponse?.text());
+      process.exit(1);
+    }
+    
+    // Set role to agent via Prisma
+    await prisma.user.update({
+      where: { email: agentEmail },
+      data: { role: "agent" },
+    });
+    console.log("Agent user seeded successfully!");
   }
 
-  console.log("Admin user seeded successfully!");
   process.exit(0);
 }
 

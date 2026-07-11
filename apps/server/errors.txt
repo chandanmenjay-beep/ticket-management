@@ -1,0 +1,43 @@
+src/controllers/tickets.controller.ts(176,16): error TS2322: Type 'string | string[]' is not assignable to type 'string | undefined'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/tickets.controller.ts(218,16): error TS2322: Type 'string | string[]' is not assignable to type 'string | undefined'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/tickets.controller.ts(247,49): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type 'IncomingHttpHeaders' is not assignable to type 'HeadersInit'.
+      Type 'IncomingHttpHeaders' is missing the following properties from type '[string, string][]': length, pop, push, concat, and 35 more.
+src/controllers/tickets.controller.ts(259,9): error TS2322: Type 'string | string[]' is not assignable to type 'string | undefined'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/users.controller.ts(37,16): error TS2322: Type 'string | string[]' is not assignable to type 'string | undefined'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/users.controller.ts(73,16): error TS2322: Type 'string | string[]' is not assignable to type 'string | undefined'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/users.controller.ts(87,16): error TS2322: Type 'string | string[]' is not assignable to type 'string | undefined'.
+  Type 'string[]' is not assignable to type 'string'.
+src/controllers/users.controller.ts(96,16): error TS2322: Type 'string | string[]' is not assignable to type 'string | StringFilter<"Session"> | undefined'.
+  Type 'string[]' is not assignable to type 'string | StringFilter<"Session"> | undefined'.
+src/controllers/users.controller.ts(101,16): error TS2322: Type 'string | string[]' is not assignable to type 'string | StringNullableFilter<"Ticket"> | null | undefined'.
+  Type 'string[]' is not assignable to type 'string | StringNullableFilter<"Ticket"> | null | undefined'.
+src/lib/boss.ts(17,38): error TS2345: Argument of type '(job: Job<ClassifyTicketData>) => Promise<void>' is not assignable to parameter of type 'WorkHandler<unknown, void>'.
+  Types of parameters 'job' and 'job' are incompatible.
+    Type 'Job<unknown>[]' is missing the following properties from type 'Job<ClassifyTicketData>': id, name, data, expireInSeconds, and 2 more.
+src/routes/ai.ts(9,47): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type 'IncomingHttpHeaders' is not assignable to type 'HeadersInit'.
+      Type 'IncomingHttpHeaders' is missing the following properties from type '[string, string][]': length, pop, push, concat, and 35 more.
+src/routes/users.ts(9,47): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type 'IncomingHttpHeaders' is not assignable to type 'HeadersInit'.
+      Type 'IncomingHttpHeaders' is missing the following properties from type '[string, string][]': length, pop, push, concat, and 35 more.
+src/routes/users.ts(20,47): error TS2769: No overload matches this call.
+  The last overload gave the following error.
+    Type 'IncomingHttpHeaders' is not assignable to type 'HeadersInit'.
+      Type 'IncomingHttpHeaders' is missing the following properties from type '[string, string][]': length, pop, push, concat, and 35 more.
+../../node_modules/.bun/@ai-sdk+provider-utils@5.0.0+68a1e3a0c4588df3/node_modules/@ai-sdk/provider-utils/dist/index.d.ts(8,61): error TS7016: Could not find a declaration file for module 'eventsource-parser/stream'. '/home/enjay/Desktop/Ticket Management/node_modules/.bun/eventsource-parser@3.1.0/node_modules/eventsource-parser/stream.js' implicitly has an 'any' type.
+  There are types at '/home/enjay/Desktop/Ticket Management/node_modules/.bun/@ai-sdk+provider-utils@5.0.0+68a1e3a0c4588df3/node_modules/eventsource-parser/dist/stream.d.ts', but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'.
+../../node_modules/.bun/@better-auth+core@1.6.20+abf1b3a1f293bd86/node_modules/@better-auth/core/dist/error/index.d.mts(2,40): error TS2307: Cannot find module 'better-call/error' or its corresponding type declarations.
+  There are types at '/home/enjay/Desktop/Ticket Management/node_modules/.bun/@better-auth+core@1.6.20+abf1b3a1f293bd86/node_modules/better-call/dist/error.d.mts', but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'.
+../../node_modules/.bun/@better-auth+core@1.6.20+abf1b3a1f293bd86/node_modules/@better-auth/core/dist/types/init-options.d.mts(17,28): error TS2307: Cannot find module '@cloudflare/workers-types' or its corresponding type declarations.
+../../node_modules/.bun/better-auth@1.6.20+350382b3eadc6076/node_modules/better-auth/dist/crypto/password.d.mts(1,30): error TS2307: Cannot find module '@better-auth/utils/password' or its corresponding type declarations.
+  There are types at '/home/enjay/Desktop/Ticket Management/node_modules/.bun/better-auth@1.6.20+350382b3eadc6076/node_modules/@better-auth/utils/dist/password.d.mts', but this result could not be resolved under your current 'moduleResolution' setting. Consider updating to 'node16', 'nodenext', or 'bundler'.
+../../node_modules/.bun/better-auth@1.6.20+350382b3eadc6076/node_modules/better-auth/dist/plugins/organization/routes/crud-members.d.mts(892,9): error TS2536: Type '"role"' cannot be used to index type '((O["teams"] extends { enabled: true; } ? { id: string; organizationId: string; role: InferOrganizationRolesFromOption<O>; createdAt: Date; userId: string; teamId?: string | undefined; user: { ...; }; } : { ...; }) & (O["schema"] extends { ...; } ? FieldAttributeToObject<...> : {}) extends infer T ? { [K in keyof T]...'.

@@ -100,8 +100,8 @@ The client proxies `/api/*` requests to the server via Vite config (target is co
 
 ### E2E Tests
 - **Framework**: Playwright
-- Use the `e2e-test-writer` agent for writing Playwright E2E tests
-- Run with `bun run test:e2e` from root
-- **Only use for things that truly require a real browser + server** — never duplicate what unit tests already cover
-- Valid E2E scenarios: auth redirects, cross-page navigation, data persistence after reload, full-stack integration flows (e.g. webhook creates data → UI displays it)
-- Invalid E2E scenarios: rendering, display logic, component states, API call verification, form validation, error messages — use component tests for these
+- Use the `e2e-test-writer` agent for writing Playwright E2E tests.
+- Run with `bun run test:e2e` from root.
+- **Rules**:
+  - Only use for things that truly require a real browser + server (e.g., auth redirects, cross-page navigation, data persistence, full-stack integration).
+  - Never duplicate what unit tests already cover (e.g., rendering, display logic, component states, API call verification, form validation, error messages).

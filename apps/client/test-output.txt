@@ -1,0 +1,21 @@
+
+ RUN  v4.1.9 /home/enjay/Desktop/Ticket Management/apps/client
+
+ ❯ src/pages/__tests__/TicketDetails.test.tsx (9 tests | 2 failed) 1915ms
+     ✓ should render loading state initially 65ms
+     ✓ should render "Ticket Not Found" on error 55ms
+     × should successfully render ticket details and message thread 91ms
+     × should render "No messages yet" if thread is empty 1015ms
+     ✓ should handle replying to a ticket  322ms
+     ✓ should disable Polish button if reply text is empty 58ms
+     ✓ should call AI Polish API and update reply text on success 122ms
+     ✓ should handle AI Polish API error gracefully 88ms
+     ✓ should update ticket status via dropdown 96ms
+ ✓ src/pages/Users.test.tsx (6 tests) 1873ms
+     ✓ opens modal on create user click, and closes on backdrop click and Escape key  1438ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 13 passed (15)
+   Start at  18:00:25
+   Duration  4.95s (transform 515ms, setup 0ms, import 2.22s, tests 3.79s, environment 2.86s)
+
