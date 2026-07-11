@@ -10,9 +10,21 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0',
+    port: parseInt(process.env.PORT || '5173'),
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: process.env.API_URL || 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: parseInt(process.env.PORT || '4173'),
+    proxy: {
+      '/api': {
+        target: process.env.API_URL || 'http://localhost:3000',
         changeOrigin: true,
       },
     },
