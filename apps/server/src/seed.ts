@@ -117,8 +117,8 @@ async function main() {
     console.log("Agent user seeded successfully!");
   }
 
-  // --- MOCK DATA GENERATION: Last 20 Days ---
-  console.log("Generating 20 days of mock ticket data...");
+  // --- MOCK DATA GENERATION: 30 Tickets for Today (Including AI Resolved) ---
+  console.log("Generating 30 mock tickets for today...");
   const agentUser = await prisma.user.findUnique({ where: { email: agentEmail } });
   
   if (agentUser) {
@@ -128,6 +128,8 @@ async function main() {
       { name: "John Doe", email: "john@example.com" },
       { name: "Jane Smith", email: "jane@example.com" },
       { name: "Bob Wilson", email: "bob@example.com" },
+      { name: "Alice Brown", email: "alice@example.com" },
+      { name: "Charlie Davis", email: "charlie@example.com" },
     ];
 
     // Create customers
@@ -144,61 +146,84 @@ async function main() {
     const today = new Date();
     let ticketsCreated = 0;
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 30; i++) {
       const date = new Date(today);
-      date.setDate(date.getDate() - i);
+      // Stagger them slightly throughout today
+      date.setMinutes(date.getMinutes() - (i * 15));
       
-      // Create 1-3 tickets per day
-      const numTickets = Math.floor(Math.random() * 3) + 1;
+      const customer = createdCustomers[Math.floor(Math.random() * createdCustomers.length)];
+      const category = categories[Math.floor(Math.random() * categories.length)];
       
-      for (let j = 0; j < numTickets; j++) {
-        const customer = createdCustomers[Math.floor(Math.random() * createdCustomers.length)];
-        const category = categories[Math.floor(Math.random() * categories.length)];
-        const status = statuses[Math.floor(Math.random() * statuses.length)];
-        
-        // Randomly assign 70% of tickets to the agent
-        const assignedToId = Math.random() > 0.3 ? agentUser.id : null;
+      // We want some to be AI resolved.
+      // Let's make ~30% AI resolved, ~40% Agent resolved/pending, ~30% open
+      const randomVal = Math.random();
+      let status = "open";
+      let isAiResolved = false;
+      let assignedToId = null;
 
-        const ticket = await prisma.ticket.create({
-          data: {
-            subject: `Issue with ${category} - Day ${i} Ticket ${j}`,
-            status,
-            category,
-            customerId: customer.id,
-            assignedToId,
-            createdAt: date,
-            updatedAt: date,
-          },
-        });
+      if (randomVal < 0.3) {
+        status = "resolved";
+        isAiResolved = true;
+      } else if (randomVal < 0.7) {
+        status = Math.random() > 0.5 ? "resolved" : "pending";
+        assignedToId = agentUser.id; // assigned to human agent
+      } else {
+        status = "open";
+      }
 
-        // Add 1-2 messages to each ticket
+      const ticket = await prisma.ticket.create({
+        data: {
+          subject: `Help with ${category} (Ticket #${i + 1})`,
+          status,
+          category,
+          customerId: customer.id,
+          assignedToId,
+          createdAt: date,
+          updatedAt: date,
+        },
+      });
+
+      // Customer's initial message
+      await prisma.ticketMessage.create({
+        data: {
+          ticketId: ticket.id,
+          bodyText: `Hello, I need some help regarding my ${category}. Can you please assist?`,
+          senderType: "CUSTOMER",
+          senderId: customer.id,
+          createdAt: date,
+        }
+      });
+
+      const replyDate = new Date(date);
+      replyDate.setMinutes(replyDate.getMinutes() + 5);
+
+      if (isAiResolved) {
+        // AI response
         await prisma.ticketMessage.create({
           data: {
             ticketId: ticket.id,
-            bodyText: `Hello, I need help with my ${category} issue.`,
-            senderType: "CUSTOMER",
-            senderId: customer.id,
-            createdAt: date,
+            bodyText: `I am the AI Assistant. I have analyzed your request regarding ${category} and applied the necessary fixes to your account. Your issue is now resolved.`,
+            senderType: "AI",
+            senderId: null, // No specific user ID for AI
+            createdAt: replyDate,
           }
         });
-
-        if (status !== "open") {
-          const replyDate = new Date(date);
-          replyDate.setHours(replyDate.getHours() + 2); // Reply 2 hours later
-          await prisma.ticketMessage.create({
-            data: {
-              ticketId: ticket.id,
-              bodyText: `We are looking into your ${category} issue.`,
-              senderType: "AGENT",
-              senderId: agentUser.id,
-              createdAt: replyDate,
-            }
-          });
-        }
-        ticketsCreated++;
+      } else if (status !== "open") {
+        // Human agent response
+        await prisma.ticketMessage.create({
+          data: {
+            ticketId: ticket.id,
+            bodyText: `Hello! I am looking into your ${category} issue right now.`,
+            senderType: "AGENT",
+            senderId: agentUser.id,
+            createdAt: replyDate,
+          }
+        });
       }
+      
+      ticketsCreated++;
     }
-    console.log(`Successfully generated ${ticketsCreated} mock tickets across the last 20 days!`);
+    console.log(`Successfully generated ${ticketsCreated} mock tickets for today!`);
   }
 
   process.exit(0);
