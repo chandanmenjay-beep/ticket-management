@@ -15,8 +15,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(helmet());
+const allowedOrigins = ["http://localhost:5173", "http://localhost:5174"];
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: allowedOrigins,
   credentials: true
 }));
 app.use(express.json());
@@ -33,8 +38,20 @@ app.use("/api/webhooks", webhooksRoute);
 app.use("/api/tickets", ticketsRoute);
 app.use("/api/ai", aiRoute);
 
-app.get('/', (req, res) => {
+// Serve client app statically in production
+const clientDistPath = path.resolve(__dirname, '../../../client/dist');
+app.use(express.static(clientDistPath));
+
+app.get('/api/health', (req, res) => {
   res.json({ message: 'Ticket Management API is running' });
+});
+
+// Fallback for SPA routing - serve index.html for unknown routes (excluding /api)
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    return next();
+  }
+  res.sendFile(path.join(clientDistPath, 'index.html'));
 });
 
 import { startBoss } from './lib/boss';
