@@ -143,11 +143,16 @@ async function main() {
       createdCustomers.push(dbCustomer);
     }
 
-    const today = new Date();
+    // Generate tickets for exactly June 29th (current year)
+    const targetDate = new Date();
+    targetDate.setMonth(5); // June (0-indexed)
+    targetDate.setDate(29);
+    targetDate.setHours(10, 0, 0, 0); // Start at 10 AM
+
     let ticketsCreated = 0;
 
     for (let i = 0; i < 30; i++) {
-      const date = new Date(today);
+      const date = new Date(targetDate);
       // Stagger them slightly throughout today
       date.setMinutes(date.getMinutes() - (i * 15));
       
