@@ -1,0 +1,11 @@
+node_modules
+.git
+.env
+.env.test
+apps/client/dist
+apps/server/dist
+.vscode
+.claude
+.agents
+playwright-report
+test-results
