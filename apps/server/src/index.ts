@@ -39,7 +39,7 @@ app.use("/api/tickets", ticketsRoute);
 app.use("/api/ai", aiRoute);
 
 // Serve client app statically in production
-const clientDistPath = path.resolve(__dirname, '../../../client/dist');
+const clientDistPath = path.resolve(__dirname, '../../client/dist');
 app.use(express.static(clientDistPath));
 
 app.get('/api/health', (req, res) => {
