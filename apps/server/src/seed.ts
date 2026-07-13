@@ -117,6 +117,90 @@ async function main() {
     console.log("Agent user seeded successfully!");
   }
 
+  // --- MOCK DATA GENERATION: Last 20 Days ---
+  console.log("Generating 20 days of mock ticket data...");
+  const agentUser = await prisma.user.findUnique({ where: { email: agentEmail } });
+  
+  if (agentUser) {
+    const categories = ["general", "technical", "refund", "renewal"];
+    const statuses = ["open", "pending", "resolved", "closed"];
+    const customers = [
+      { name: "John Doe", email: "john@example.com" },
+      { name: "Jane Smith", email: "jane@example.com" },
+      { name: "Bob Wilson", email: "bob@example.com" },
+    ];
+
+    // Create customers
+    const createdCustomers = [];
+    for (const c of customers) {
+      const dbCustomer = await prisma.customer.upsert({
+        where: { email: c.email },
+        update: {},
+        create: c,
+      });
+      createdCustomers.push(dbCustomer);
+    }
+
+    const today = new Date();
+    let ticketsCreated = 0;
+
+    for (let i = 0; i < 20; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      
+      // Create 1-3 tickets per day
+      const numTickets = Math.floor(Math.random() * 3) + 1;
+      
+      for (let j = 0; j < numTickets; j++) {
+        const customer = createdCustomers[Math.floor(Math.random() * createdCustomers.length)];
+        const category = categories[Math.floor(Math.random() * categories.length)];
+        const status = statuses[Math.floor(Math.random() * statuses.length)];
+        
+        // Randomly assign 70% of tickets to the agent
+        const assignedToId = Math.random() > 0.3 ? agentUser.id : null;
+
+        const ticket = await prisma.ticket.create({
+          data: {
+            subject: `Issue with ${category} - Day ${i} Ticket ${j}`,
+            status,
+            category,
+            customerId: customer.id,
+            assignedToId,
+            createdAt: date,
+            updatedAt: date,
+          },
+        });
+
+        // Add 1-2 messages to each ticket
+        await prisma.ticketMessage.create({
+          data: {
+            ticketId: ticket.id,
+            bodyText: `Hello, I need help with my ${category} issue.`,
+            senderType: "CUSTOMER",
+            senderId: customer.id,
+            createdAt: date,
+          }
+        });
+
+        if (status !== "open") {
+          const replyDate = new Date(date);
+          replyDate.setHours(replyDate.getHours() + 2); // Reply 2 hours later
+          await prisma.ticketMessage.create({
+            data: {
+              ticketId: ticket.id,
+              bodyText: `We are looking into your ${category} issue.`,
+              senderType: "AGENT",
+              senderId: agentUser.id,
+              createdAt: replyDate,
+            }
+          });
+        }
+        ticketsCreated++;
+      }
+    }
+    console.log(`Successfully generated ${ticketsCreated} mock tickets across the last 20 days!`);
+  }
+
   process.exit(0);
 }
 
