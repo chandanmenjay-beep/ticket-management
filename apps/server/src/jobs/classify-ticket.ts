@@ -104,11 +104,26 @@ ${bodyText}`
       }
     }
 
+    let agentToAssign = null;
+    if (resolved) {
+      try {
+        const agents = await prisma.user.findMany({
+          where: { role: 'agent' }
+        });
+        if (agents.length > 0) {
+          const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+          agentToAssign = randomAgent.id;
+        }
+      } catch (e) {
+        console.error(`[Job] Failed to assign agent to ticket ${ticketId}`, e);
+      }
+    }
+
     await prisma.ticket.update({
       where: { id: ticketId },
       data: { 
         category,
-        ...(resolved ? { status: 'resolved' } : { assignedToId: null })
+        ...(resolved ? { status: 'resolved', assignedToId: agentToAssign } : { assignedToId: null })
       }
     });
     console.log(`[Job] Classified ticket ${ticketId} as ${category}`);
