@@ -49,6 +49,7 @@ export default function TicketDetails() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [replyText, setReplyText] = useState('');
   const [ticketSummary, setTicketSummary] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const { data: ticket, isPending: isTicketPending, error } = useQuery<TicketDetailData>({
     queryKey: ['ticket', id],
@@ -134,9 +135,7 @@ export default function TicketDetails() {
   });
 
   const handleDelete = () => {
-    if (window.confirm("Are you sure you want to delete this ticket? This action cannot be undone.")) {
-      deleteMutation.mutate();
-    }
+    deleteMutation.mutate();
   };
 
   const handleReplySubmit = (e: React.FormEvent) => {
@@ -209,7 +208,7 @@ export default function TicketDetails() {
               
               {session?.user?.role === 'admin' && (
                 <button
-                  onClick={handleDelete}
+                  onClick={() => setShowDeleteModal(true)}
                   disabled={deleteMutation.isPending}
                   className="text-zinc-400 hover:text-red-400 bg-zinc-900/50 hover:bg-red-400/10 border border-transparent hover:border-red-500/20 p-2.5 rounded-xl transition-all disabled:opacity-50"
                   title="Delete Ticket"
@@ -433,6 +432,38 @@ export default function TicketDetails() {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl w-full max-w-md shadow-2xl"
+          >
+            <h3 className="text-xl font-bold text-white mb-2">Delete Ticket?</h3>
+            <p className="text-zinc-400 mb-6 text-sm">
+              Are you sure you want to permanently delete this ticket and all its replies? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button 
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDelete}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-500 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+              >
+                {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
