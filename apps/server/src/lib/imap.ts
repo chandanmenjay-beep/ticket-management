@@ -26,7 +26,7 @@ export const startImapListener = async () => {
     try {
       lock = await client.getMailboxLock('INBOX');
       // Search for unseen messages
-      const list = await client.search({ unseen: true });
+      const list = await client.search({ seen: false });
       if (list && list.length > 0) {
         for (const seq of list) {
           try {
