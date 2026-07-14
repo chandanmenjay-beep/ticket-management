@@ -106,10 +106,6 @@ export default function TicketDetails() {
     },
     onSuccess: (polishedText) => {
       setReplyText(polishedText);
-    },
-    onError: (error: any) => {
-      const msg = error.response?.data?.error || 'Failed to polish text. Please try again.';
-      alert(`AI Error: ${msg}`);
     }
   });
 
@@ -120,10 +116,6 @@ export default function TicketDetails() {
     },
     onSuccess: (summary) => {
       setTicketSummary(summary);
-    },
-    onError: (error: any) => {
-      const msg = error.response?.data?.error || 'Failed to generate summary. Please try again.';
-      alert(`AI Error: ${msg}`);
     }
   });
 
@@ -239,6 +231,13 @@ export default function TicketDetails() {
             {/* Summarize Action & Output */}
             {ticket.messages.length > 0 && (
               <div className="mt-6">
+                {summarizeMutation.error && (
+                  <div className="mb-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-lg flex items-start gap-2">
+                    <span className="font-semibold">Error:</span>
+                    {(summarizeMutation.error as any).response?.data?.error || 'Failed to generate summary. Please try again.'}
+                  </div>
+                )}
+                
                 {!ticketSummary && (
                   <button
                     onClick={() => summarizeMutation.mutate({ subject: ticket.subject, messages: ticket.messages })}
@@ -282,6 +281,14 @@ export default function TicketDetails() {
             {/* Reply Form */}
             <div className="mt-8">
               <h3 className="text-lg font-semibold text-white mb-4">Add a Reply</h3>
+              
+              {polishMutation.error && (
+                <div className="mb-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 p-3 rounded-lg flex items-start gap-2">
+                  <span className="font-semibold">Error:</span>
+                  {(polishMutation.error as any).response?.data?.error || 'Failed to polish text. Please try again.'}
+                </div>
+              )}
+              
               <form onSubmit={handleReplySubmit} className="relative">
                 <textarea
                   value={replyText}
