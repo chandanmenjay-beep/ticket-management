@@ -112,8 +112,17 @@ ${bodyText}`
       }
     });
     console.log(`[Job] Classified ticket ${ticketId} as ${category}`);
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[Job] Failed to classify ticket ${ticketId}:`, error);
-    throw error; // pg-boss will handle retries if configured
+    try {
+      await prisma.ticketMessage.create({
+        data: {
+          ticketId,
+          bodyText: `[SYSTEM ERROR] AI Auto-responder failed to process this ticket.\nError: ${error.message || 'Unknown error'}`,
+          senderType: 'AGENT',
+        }
+      });
+    } catch(e) {}
+    throw error;
   }
 }
