@@ -11,10 +11,14 @@ interface ClassifyTicketData {
   ticketId: string;
   subject: string;
   bodyText: string;
+  customerEmail?: string;
+  customerName?: string;
 }
 
+import { sendEmail } from '../lib/email';
+
 export async function classifyTicketJob(job: Job<ClassifyTicketData>) {
-  const { ticketId, subject, bodyText } = job.data;
+  const { ticketId, subject, bodyText, customerEmail, customerName } = job.data;
   console.log(`[Job] Classifying ticket ${ticketId}...`);
 
   try {
@@ -89,6 +93,13 @@ ${bodyText}`
         });
         resolved = true;
         console.log(`[Job] Ticket ${ticketId} auto-resolved by AI.`);
+
+        // Send email back to the customer if email is provided
+        if (customerEmail) {
+          const emailSubject = `Re: ${subject} [Ticket #${ticketId}]`;
+          const emailBody = `<p>Hi ${customerName || customerFirstName},</p><br/><p>${resolution.response.replace(/\\n/g, '<br/>')}</p>`;
+          await sendEmail(customerEmail, emailSubject, emailBody);
+        }
       }
     }
 

@@ -106,6 +106,10 @@ export default function TicketDetails() {
     },
     onSuccess: (polishedText) => {
       setReplyText(polishedText);
+    },
+    onError: (error: any) => {
+      const msg = error.response?.data?.error || 'Failed to polish text. Please try again.';
+      alert(`AI Error: ${msg}`);
     }
   });
 
@@ -116,6 +120,10 @@ export default function TicketDetails() {
     },
     onSuccess: (summary) => {
       setTicketSummary(summary);
+    },
+    onError: (error: any) => {
+      const msg = error.response?.data?.error || 'Failed to generate summary. Please try again.';
+      alert(`AI Error: ${msg}`);
     }
   });
 

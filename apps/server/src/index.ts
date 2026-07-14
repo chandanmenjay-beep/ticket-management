@@ -55,8 +55,10 @@ app.get('*', (req, res, next) => {
 });
 
 import { startBoss } from './lib/boss';
+import { startImapListener } from './lib/imap';
 
 startBoss().then(() => {
+  startImapListener();
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
