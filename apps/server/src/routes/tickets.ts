@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getTickets, getTicketStats, getTicketChartData, getTicketById, updateTicket, addTicketMessage } from '../controllers/tickets.controller';
+import { getTickets, getTicketStats, getTicketChartData, getTicketById, updateTicket, addTicketMessage, deleteTicket } from '../controllers/tickets.controller';
 import { prisma } from '../lib/auth';
 
 const router = Router();
@@ -10,5 +10,6 @@ router.get('/chart', getTicketChartData);
 router.get('/:id', getTicketById);
 router.patch('/:id', updateTicket);
 router.post('/:id/messages', addTicketMessage);
+router.delete('/:id', deleteTicket);
 
 export default router;

@@ -269,3 +269,27 @@ export const addTicketMessage = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to add message' });
   }
 };
+
+export const deleteTicket = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    const session = await auth.api.getSession({ headers: req.headers as HeadersInit });
+    if (!session) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    if (session.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Forbidden: Only admins can delete tickets' });
+    }
+
+    await prisma.ticket.delete({
+      where: { id: id as string }
+    });
+
+    res.json({ message: 'Ticket deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting ticket:', error);
+    res.status(500).json({ error: 'Failed to delete ticket' });
+  }
+};

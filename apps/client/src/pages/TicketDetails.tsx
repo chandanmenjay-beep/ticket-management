@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowDown, Send, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowDown, Send, Sparkles, Trash2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { useSession } from '../lib/auth.client';
@@ -119,6 +119,26 @@ export default function TicketDetails() {
     }
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      await axios.delete(`/api/tickets/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tickets'] });
+      navigate('/tickets');
+    },
+    onError: (error: any) => {
+      const msg = error.response?.data?.error || 'Failed to delete ticket.';
+      alert(`Error: ${msg}`);
+    }
+  });
+
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to delete this ticket? This action cannot be undone.")) {
+      deleteMutation.mutate();
+    }
+  };
+
   const handleReplySubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (replyText.trim() === '' || addMessageMutation.isPending) return;
@@ -171,19 +191,32 @@ export default function TicketDetails() {
           {/* Main Content Column */}
           <div className="flex-1 min-w-0">
             {/* Header / Meta */}
-            <div className="mb-8">
-              <h1 className="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
-                {ticket.subject}
-              </h1>
-              <div className="text-sm text-zinc-400 space-y-1">
-                <div>
-                  From: <span className="text-zinc-200">{ticket.customer.name || 'Unknown'}</span> ({ticket.customer.email})
+            <div className="mb-8 flex justify-between items-start gap-4">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
+                  {ticket.subject}
+                </h1>
+                <div className="text-sm text-zinc-400 space-y-1">
+                  <div>
+                    From: <span className="text-zinc-200">{ticket.customer.name || 'Unknown'}</span> ({ticket.customer.email})
+                  </div>
+                  <div>Created: {new Date(ticket.createdAt).toLocaleString()}</div>
+                  {ticket.updatedAt && (
+                    <div>Updated: {new Date(ticket.updatedAt).toLocaleString()}</div>
+                  )}
                 </div>
-                <div>Created: {new Date(ticket.createdAt).toLocaleString()}</div>
-                {ticket.updatedAt && (
-                  <div>Updated: {new Date(ticket.updatedAt).toLocaleString()}</div>
-                )}
               </div>
+              
+              {session?.user?.role === 'admin' && (
+                <button
+                  onClick={handleDelete}
+                  disabled={deleteMutation.isPending}
+                  className="text-zinc-400 hover:text-red-400 bg-zinc-900/50 hover:bg-red-400/10 border border-transparent hover:border-red-500/20 p-2.5 rounded-xl transition-all disabled:opacity-50"
+                  title="Delete Ticket"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              )}
             </div>
 
             {/* Messages Thread */}
