@@ -65,9 +65,10 @@ export async function classifyTicketJob(job: Job<ClassifyTicketData>) {
           response: z.string().nullable().describe('The message to send to the customer if it can be resolved'),
         }),
         prompt: `You are a helpful customer support agent.
-Use the following knowledge base to resolve the customer's issue.
-If the knowledge base contains the answer, set canResolve to true and provide the exact response to send to the customer in 'response'.
-If the knowledge base DOES NOT contain the answer, set canResolve to false and response to null.
+Use the provided knowledge base to help answer the user's query if applicable.
+If the knowledge base doesn't contain the exact answer, you can still use your general knowledge to provide a helpful, professional troubleshooting response.
+If you can provide a helpful response (either from KB or general knowledge), set canResolve to true and provide the exact response to send to the customer in 'response'.
+If the query is too complex, requires internal system access, or you simply cannot help, set canResolve to false and response to null.
 
 CRITICAL INSTRUCTIONS FOR THE REPLY:
 - Address the customer by their first name: ${customerFirstName}
